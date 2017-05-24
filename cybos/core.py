@@ -1,10 +1,9 @@
 from win32com import client
 
 
-class StockChart:
+class CybosClient:
 
-    def __init__(self):
-        self.__client__ = client.Dispatch("CpSysDib.StockChart")
+    __client__ = None
 
     def get_header(self, index):
         return self.__client__.GetHeaderValue(index)
@@ -17,6 +16,11 @@ class StockChart:
 
     def set_input_value(self, key, value):
         self.__client__.SetInputValue(key, value)
+
+
+class StockChart(CybosClient):
+
+    __client__ = client.Dispatch("CpSysDib.StockChart")
 
 
 class Cybos:
