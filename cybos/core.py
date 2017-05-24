@@ -23,15 +23,30 @@ class StockChart(CybosClient):
     __client__ = client.Dispatch("CpSysDib.StockChart")
 
 
+class StockTrader(CybosClient):
+
+    __client__ = client.Dispatch("CpTrade.CpTdUtil")
+
+    def __init__(self):
+        self.__client__.TradeInit()
+
+
 class Cybos:
 
     __stock_chart__ = None
+    __stock_trader__ = None
 
     @property
     def stock_chart(self):
         if self.__stock_chart__ is None:
             self.__stock_chart__ = StockChart()
         return self.__stock_chart__
+
+    @property
+    def stock_trader(self):
+        if self.__stock_trader__ is None:
+            self.__stock_trader__ = StockTrader()
+        return self.__stock_trader__
 
     def get_chart(self, code, count=10):
         self.stock_chart.set_input_value(0, code)
