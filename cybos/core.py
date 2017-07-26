@@ -1,3 +1,8 @@
+import time
+
+import psutil
+import pyautogui
+import pywinauto
 from win32com import client
 
 
@@ -48,6 +53,29 @@ class Cybos:
             self.__stock_trader__ = StockTrader()
         return self.__stock_trader__
 
+    @staticmethod
+    def run_process(account_password, certification_password):
+        app = pywinauto.Application()
+        app.start('D:\DAISHIN\STARTER\\ncStarter.exe /prj:cp')
+        time.sleep(1)
+        pyautogui.typewrite('\n', interval=0.1)
+
+        dialog = pywinauto.timings.WaitUntilPasses(20, 0.5, lambda: app.window(title='CYBOS Starter'))
+
+        account_password_input = dialog.Edit2
+        account_password_input.SetFocus()
+        account_password_input.TypeKeys(account_password)
+
+        certification_password_input = dialog.Edit3
+        certification_password_input.SetFocus()
+        certification_password_input.TypeKeys(certification_password)
+
+        dialog.Button.Click()
+
+        time.sleep(5)
+        pyautogui.typewrite('\n', interval=0.5)
+        time.sleep(10)
+
     def get_chart(self, code, count=10):
         self.stock_chart.set_input_value(0, code)
         self.stock_chart.set_input_value(1, ord('2'))
@@ -69,3 +97,7 @@ class Cybos:
                 data.append(self.stock_chart.get_data(column, row))
             results.append(data)
         return results
+
+    def __init__(self, account_password, certification_password):
+        if 'CpStart.exe' not in [p.name() for p in psutil.process_iter()]:
+            self.run_process(account_password, certification_password)
