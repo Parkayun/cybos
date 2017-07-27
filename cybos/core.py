@@ -45,7 +45,12 @@ class StockConclusion(CybosClient):
 
     __client__ = client.Dispatch("dscbo1.CpConclusion")
 
-    def subscribe(self):
+    def subscribe(self, callback=None):
+        if callback is not None and callable(callback):
+            class Callback:
+                def OnReceived(self):
+                    callback()
+            client.WithEvents(self.__client__, Callback)
         self.__client__.Subscribe()
 
     def unsubscribe(self):
@@ -146,7 +151,7 @@ class Cybos:
     def buy(self, code, quantity, price, bank_account_number=''):
         self.trade(2, code, quantity, price, bank_account_number)
 
-    def __init__(self, account_password, certification_password, bank_account_number='', callback=None):
+    def __init__(self, account_password, certification_password, bank_account_number=''):
         if 'CpStart.exe' not in [p.name() for p in psutil.process_iter()]:
             self.run_process(account_password, certification_password)
 
@@ -154,9 +159,3 @@ class Cybos:
             self.__bank_account_number__ = self.stock_util.__client__.AccountNumber[0]
         else:
             self.__bank_account_number__ = bank_account_number
-
-        if callback is not None and callable(callback):
-            class Callback:
-                def OnReceived(self):
-                    callback()
-            client.WithEvents(self.stock_conclusion.__client__, Callback)
